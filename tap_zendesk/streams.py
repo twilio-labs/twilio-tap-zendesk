@@ -33,7 +33,6 @@ def get_abs_path(path):
 
 def process_custom_field(field):
     """ Take a custom field description and return a schema for it. """
-
     zendesk_type = field.type
     json_type = CUSTOM_TYPES.get(zendesk_type)
     if json_type is None:
@@ -77,7 +76,6 @@ class Stream():
         schema_file = "schemas/{}.json".format(self.name)
         with open(get_abs_path(schema_file)) as f:
             schema = json.load(f)
-
         return self._add_custom_fields(schema)
 
     def _add_custom_fields(self, schema): # pylint: disable=no-self-use

@@ -3,7 +3,6 @@ import json
 import singer
 from tap_zendesk.streams import STREAMS
 
-
 def get_abs_path(path):
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
 
