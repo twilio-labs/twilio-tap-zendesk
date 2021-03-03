@@ -77,7 +77,6 @@ class Stream():
         schema_file = "schemas/{}.json".format(self.name)
         with open(get_abs_path(schema_file)) as f:
             schema = json.load(f)
-            LOGGER.info(schema)
 
         return self._add_custom_fields(schema)
 
@@ -156,12 +155,10 @@ class Users(Stream):
     def _add_custom_fields(self, schema):
         try:
             field_gen = self.client.user_fields()
-            LOGGER.info(field_gen)
         except zenpy.lib.exception.APIException as e:
             return raise_or_log_zenpy_apiexception(schema, self.name, e)
         schema['properties']['user_fields']['properties'] = {}
         for field in field_gen:
-            LOGGER.info(field.to_dict())
             schema['properties']['user_fields']['properties'][field.key] = process_custom_field(field)
 
         return schema
