@@ -10,7 +10,7 @@ setup(name='tap-zendesk',
       classifiers=['Programming Language :: Python :: 3 :: Only'],
       py_modules=['tap_zendesk'],
       install_requires=[
-          'singer-python @ git+https://github.com/BenjMaq/singer-python@bump_pytz_version',
+          'pipelinewise-singer-python==1.2.0',
           'zenpy==2.0.13',
       ],
       extras_require={
