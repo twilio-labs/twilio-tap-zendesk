@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.4
+  * Add `default` and `description` fields to groups stream schema
+  * Add new stream ticket_metric_events
+  * Update singer-python dependency from `singer-python==5.2.1` to pipelinewise's version `pipelinewise-singer-python==1.2.0`
+  * Add new fields to users stream schema
+  * Add new fields to tickets stream schema
+
 ## 1.5.3
   * Break out of infinite loop with users stream and bookmark on date window end [#46](https://github.com/singer-io/tap-zendesk/pull/46)
 
