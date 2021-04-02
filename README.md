@@ -1,4 +1,4 @@
-# tap-zendesk
+# bmaquet-tap-zendesk
 Tap for Zendesk
 
 ## Installation

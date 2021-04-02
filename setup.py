@@ -2,13 +2,13 @@
 
 from setuptools import setup
 
-setup(name='tap-zendesk',
+setup(name='bmaquet-tap-zendesk',
       version='1.5.4',
       description='Singer.io tap for extracting data from the Zendesk API',
       author='Stitch',
       url='https://singer.io',
       classifiers=['Programming Language :: Python :: 3 :: Only'],
-      py_modules=['tap_zendesk'],
+      py_modules=['bmaquet_tap_zendesk'],
       install_requires=[
           'pipelinewise-singer-python==1.2.0',
           'zenpy==2.0.13',
@@ -23,8 +23,8 @@ setup(name='tap-zendesk',
       },
       entry_points='''
           [console_scripts]
-          tap-zendesk=tap_zendesk:main
+          bmaquet-tap-zendesk=bmaquet_tap_zendesk:main
       ''',
-      packages=['tap_zendesk'],
+      packages=['bmaquet_tap_zendesk'],
       include_package_data=True,
 )
