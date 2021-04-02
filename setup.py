@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='bmaquet-tap-zendesk',
-      version='1.5.4',
+      version='0.0.1',
       description='Singer.io tap for extracting data from the Zendesk API',
       author='Stitch',
       url='https://singer.io',
