@@ -1,4 +1,4 @@
-# bmaquet-tap-zendesk
+# twilio-tap-zendesk
 Tap for Zendesk
 
 ## Installation
