@@ -28,6 +28,9 @@ CUSTOM_TYPES = {
 
 DEFAULT_SEARCH_WINDOW_SIZE = (60 * 60 * 24) * 30 # defined in seconds, default to a month (30 days)
 
+def get_sideload_objects(stream):
+    return metadata.to_map(stream.metadata).get((), {}).get('sideload-objects')
+
 def get_abs_path(path):
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
 
@@ -250,7 +253,8 @@ class Tickets(Stream):
 
     def sync(self, state):
         bookmark = self.get_bookmark(state)
-        tickets = self.client.tickets.incremental(start_time=bookmark)
+        sideload_objects = get_sideload_objects(self.stream)
+        tickets = self.client.tickets.incremental(start_time=bookmark, include=sideload_objects)
 
         audits_stream = TicketAudits(self.client)
         metrics_stream = TicketMetrics(self.client)
