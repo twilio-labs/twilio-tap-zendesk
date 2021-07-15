@@ -277,7 +277,7 @@ class Tickets(Stream):
             self.update_bookmark(state, utils.strftime(generated_timestamp_dt))
 
             ticket_dict = ticket.to_dict()
-            LOGGER.info("keys ====" + str(ticket_dict.keys))
+            LOGGER.info("keys ====" + str(ticket_dict.keys()))
             ticket_dict.pop('fields') # NB: Fields is a duplicate of custom_fields, remove before emitting
             should_yield = self._buffer_record((self.stream, ticket_dict))
 
