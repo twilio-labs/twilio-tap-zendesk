@@ -3,8 +3,7 @@
 from setuptools import setup
 
 setup(
-    # name='twilio-tap-zendesk',
-      name='twiliointernal_tap-zendesk-des-1610',
+      name='twilio-tap-zendesk-guptaa3',
       version='0.0.1',
       description='Singer.io tap for extracting data from the Zendesk API',
       author='Twilio',
