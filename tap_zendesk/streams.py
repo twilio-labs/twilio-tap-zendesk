@@ -256,7 +256,6 @@ class Tickets(Stream):
         bookmark = self.get_bookmark(state)
         sideload_objects = get_sideload_objects(self.stream)
         tickets = self.client.tickets.incremental(start_time=bookmark, include=sideload_objects)
-        LOGGER.info("one record -----> " + str(tickets[0].to_dict()))
         audits_stream = TicketAudits(self.client)
         metrics_stream = TicketMetrics(self.client)
         comments_stream = TicketComments(self.client)
@@ -278,6 +277,7 @@ class Tickets(Stream):
             self.update_bookmark(state, utils.strftime(generated_timestamp_dt))
 
             ticket_dict = ticket.to_dict()
+            LOGGER.info("keys ====" + str(ticket_dict.keys))
             ticket_dict.pop('fields') # NB: Fields is a duplicate of custom_fields, remove before emitting
             should_yield = self._buffer_record((self.stream, ticket_dict))
 
