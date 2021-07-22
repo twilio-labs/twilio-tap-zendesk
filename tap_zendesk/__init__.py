@@ -84,6 +84,7 @@ def get_abs_path(path):
 
 
 def get_side_load_schemas(sideload_objects, stream):
+    """Returns the updated schema after adding side load objects to schema dict"""
     stream_schema = stream.schema.to_dict()
     for sideload_object in sideload_objects:
         if sideload_object in SIDELOAD_OBJECTS[stream.tap_stream_id]:

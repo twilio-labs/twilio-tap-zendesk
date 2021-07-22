@@ -29,6 +29,7 @@ CUSTOM_TYPES = {
 DEFAULT_SEARCH_WINDOW_SIZE = (60 * 60 * 24) * 30 # defined in seconds, default to a month (30 days)
 
 def get_sideload_objects(stream):
+    """Returns the value of sideload-objects from metadata, returns None if no values are present"""
     return metadata.to_map(stream.metadata).get((), {}).get('sideload-objects')
 
 def get_abs_path(path):
