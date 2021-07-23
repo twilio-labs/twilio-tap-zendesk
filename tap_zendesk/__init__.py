@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 import json
-import sys
+import sys, os
 
 from zenpy import Zenpy
 import requests
 from requests import Session
 from requests.adapters import HTTPAdapter
 import singer
-from singer import metadata, metrics as singer_metrics
+from singer import metadata, Schema, metrics as singer_metrics
 from tap_zendesk import metrics as zendesk_metrics
 from tap_zendesk.discover import discover_streams
 from tap_zendesk.streams import STREAMS
@@ -34,6 +34,7 @@ API_TOKEN_CONFIG_KEYS = [
 # patch Session.request to record HTTP request metrics
 request = Session.request
 
+
 def request_metrics_patch(self, method, url, **kwargs):
     with singer_metrics.http_request_timer(None):
         return request(self, method, url, **kwargs)
@@ -47,8 +48,10 @@ def do_discover(client):
     json.dump(catalog, sys.stdout, indent=2)
     LOGGER.info("Finished discover")
 
+
 def stream_is_selected(mdata):
     return mdata.get((), {}).get('selected', False)
+
 
 def get_selected_streams(catalog):
     selected_stream_names = []
@@ -63,14 +66,38 @@ SUB_STREAMS = {
     'tickets': ['ticket_audits', 'ticket_metrics', 'ticket_comments']
 }
 
+# only side loading objects that are returned as a child object and not a separate array
+SIDELOAD_OBJECTS = {
+    'tickets': ['metric_sets', 'dates', 'comment_count', 'slas']
+}
+
+
 def get_sub_stream_names():
     sub_stream_names = []
     for parent_stream in SUB_STREAMS:
         sub_stream_names.extend(SUB_STREAMS[parent_stream])
     return sub_stream_names
 
+
+def get_abs_path(path):
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
+
+
+def get_side_load_schemas(sideload_objects, stream):
+    """Returns the updated schema after adding side load objects to schema dict"""
+    stream_schema = stream.schema.to_dict()
+    for sideload_object in sideload_objects:
+        if sideload_object in SIDELOAD_OBJECTS[stream.tap_stream_id]:
+            schema_file = "schemas/sideload_schemas/{}.json".format(sideload_object)
+            with open(get_abs_path(schema_file)) as f:
+                schema = json.load(f)
+                stream_schema['properties'][list(schema['properties'].keys())[0]] = list(schema['properties'].values())[0]
+    return stream_schema
+
+
 class DependencyException(Exception):
     pass
+
 
 def validate_dependencies(selected_stream_ids):
     errs = []
@@ -85,13 +112,14 @@ def validate_dependencies(selected_stream_ids):
     if errs:
         raise DependencyException(" ".join(errs))
 
+
 def populate_class_schemas(catalog, selected_stream_names):
     for stream in catalog.streams:
         if stream.tap_stream_id in selected_stream_names:
             STREAMS[stream.tap_stream_id].stream = stream
 
-def do_sync(client, catalog, state, config):
 
+def do_sync(client, catalog, state, config):
     selected_stream_names = get_selected_streams(catalog)
     validate_dependencies(selected_stream_names)
     populate_class_schemas(catalog, selected_stream_names)
@@ -104,18 +132,12 @@ def do_sync(client, catalog, state, config):
             LOGGER.info("%s: Skipping - not selected", stream_name)
             continue
 
-        # if starting_stream:
-        #     if starting_stream == stream_name:
-        #         LOGGER.info("%s: Resuming", stream_name)
-        #         starting_stream = None
-        #     else:
-        #         LOGGER.info("%s: Skipping - already synced", stream_name)
-        #         continue
-        # else:
-        #     LOGGER.info("%s: Starting", stream_name)
-
-
         key_properties = metadata.get(mdata, (), 'table-key-properties')
+        sideload_objects = metadata.get(mdata, (), 'sideload-objects')
+        if sideload_objects:
+            stream_schema = get_side_load_schemas(sideload_objects, stream)
+            stream.schema = Schema.from_dict(stream_schema)
+
         singer.write_schema(stream_name, stream.schema.to_dict(), key_properties)
 
         sub_stream_names = SUB_STREAMS.get(stream_name)
@@ -126,6 +148,10 @@ def do_sync(client, catalog, state, config):
                 sub_stream = STREAMS[sub_stream_name].stream
                 sub_mdata = metadata.to_map(sub_stream.metadata)
                 sub_key_properties = metadata.get(sub_mdata, (), 'table-key-properties')
+                sideload_objects = metadata.get(mdata, (), 'sideload-objects')
+                if sideload_objects:
+                    sub_stream_schema = get_side_load_schemas(sideload_objects, sub_stream)
+                    sub_stream.schema = Schema.from_dict(sub_stream_schema)
                 singer.write_schema(sub_stream.tap_stream_id, sub_stream.schema.to_dict(), sub_key_properties)
 
         # parent stream will sync sub stream
@@ -143,6 +169,7 @@ def do_sync(client, catalog, state, config):
     LOGGER.info("Finished sync")
     zendesk_metrics.log_aggregate_rates()
 
+
 def oauth_auth(args):
     if not set(OAUTH_CONFIG_KEYS).issubset(args.config.keys()):
         LOGGER.debug("OAuth authentication unavailable.")
@@ -153,6 +180,7 @@ def oauth_auth(args):
         "subdomain": args.config['subdomain'],
         "oauth_token": args.config['access_token'],
     }
+
 
 def api_token_auth(args):
     if not set(API_TOKEN_CONFIG_KEYS).issubset(args.config.keys()):
@@ -165,6 +193,7 @@ def api_token_auth(args):
         "email": args.config['email'],
         "token": args.config['api_token']
     }
+
 
 def get_session(config):
     """ Add partner information to requests Session object if specified in the config. """
@@ -180,6 +209,7 @@ def get_session(config):
     session.headers["X-Zendesk-Marketplace-Organization-Id"] = str(config.get("marketplace_organization_id", ""))
     session.headers["X-Zendesk-Marketplace-App-Id"] = str(config.get("marketplace_app_id", ""))
     return session
+
 
 @singer.utils.handle_top_exception(LOGGER)
 def main():
