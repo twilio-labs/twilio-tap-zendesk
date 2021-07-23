@@ -87,11 +87,12 @@ def get_side_load_schemas(sideload_objects, stream):
     """Returns the updated schema after adding side load objects to schema dict"""
     stream_schema = stream.schema.to_dict()
     for sideload_object in sideload_objects:
-        if sideload_object in SIDELOAD_OBJECTS[stream.tap_stream_id]:
-            schema_file = "schemas/sideload_schemas/{}.json".format(sideload_object)
-            with open(get_abs_path(schema_file)) as f:
-                schema = json.load(f)
-                stream_schema['properties'][list(schema['properties'].keys())[0]] = list(schema['properties'].values())[0]
+        if stream.tap_stream_id in SIDELOAD_OBJECTS:
+            if sideload_object in SIDELOAD_OBJECTS[stream.tap_stream_id]:
+                schema_file = "schemas/sideload_schemas/{}.json".format(sideload_object)
+                with open(get_abs_path(schema_file)) as f:
+                    schema = json.load(f)
+                    stream_schema['properties'][list(schema['properties'].keys())[0]] = list(schema['properties'].values())[0]
     return stream_schema
 
 
