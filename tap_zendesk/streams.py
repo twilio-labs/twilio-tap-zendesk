@@ -10,6 +10,7 @@ from singer import metadata
 from singer import utils
 from singer.metrics import Point
 from tap_zendesk import metrics as zendesk_metrics
+from tap_zendesk.sync import process_record
 
 
 LOGGER = singer.get_logger()
@@ -31,6 +32,13 @@ DEFAULT_SEARCH_WINDOW_SIZE = (60 * 60 * 24) * 30 # defined in seconds, default t
 def get_sideload_objects(stream):
     """Returns the value of sideload-objects from metadata, returns None if no values are present"""
     return metadata.to_map(stream.metadata).get((), {}).get('sideload-objects')
+
+def check_end_date(record, end_date, replication_key):
+    record_key_date =process_record(record)[replication_key]
+    end_date = round(datetime.datetime.strptime(end_date, "%Y-%m-%dT%I:%M:%SZ").timestamp())
+    if not isinstance(record_key_date, int):
+        record_key_date = round(datetime.datetime.strptime(record_key_date, "%Y-%m-%dT%I:%M:%SZ").timestamp())
+    return record_key_date > end_date
 
 def get_abs_path(path):
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
@@ -145,6 +153,10 @@ class Organizations(Stream):
         bookmark = self.get_bookmark(state)
         organizations = self.client.organizations.incremental(start_time=bookmark)
         for organization in organizations:
+            if 'end_date' in self.config:
+                end_date_reached = check_end_date(organization, self.config['end_date'], self.replication_key)
+                if end_date_reached:
+                    break;
             self.update_bookmark(state, organization.updated_at)
             yield (self.stream, organization)
 
@@ -171,7 +183,10 @@ class Users(Stream):
         bookmark = self.get_bookmark(state)
         start = bookmark - datetime.timedelta(seconds=1)
         end = start + datetime.timedelta(seconds=search_window_size)
-        sync_end = singer.utils.now() - datetime.timedelta(minutes=1)
+        if 'end_date' in self.config:
+            sync_end = datetime.datetime.strptime(self.config['end_date'], "%Y-%m-%dT%I:%M:%SZ").replace(tzinfo=pytz.UTC)
+        else:
+            sync_end = singer.utils.now() - datetime.timedelta(minutes=1)
         parsed_sync_end = singer.strftime(sync_end, "%Y-%m-%dT%H:%M:%SZ")
 
         # ASSUMPTION: updated_at value always comes back in utc
@@ -274,6 +289,12 @@ class Tickets(Stream):
         for ticket in tickets:
             zendesk_metrics.capture('ticket')
             generated_timestamp_dt = datetime.datetime.utcfromtimestamp(ticket.generated_timestamp).replace(tzinfo=pytz.UTC)
+
+            if 'end_date' in self.config:
+                end_date_reached = check_end_date(ticket, self.config['end_date'], self.replication_key)
+                if end_date_reached:
+                    break;
+
             self.update_bookmark(state, utils.strftime(generated_timestamp_dt))
 
             ticket_dict = ticket.to_dict()
@@ -375,7 +396,10 @@ class SatisfactionRatings(Stream):
         #start = bookmark_epoch-1
         start = bookmark - datetime.timedelta(seconds=1)
         end = start + datetime.timedelta(seconds=search_window_size)
-        sync_end = singer.utils.now() - datetime.timedelta(minutes=1)
+        if 'end_date' in self.config:
+            sync_end = datetime.datetime.strptime(self.config['end_date'], "%Y-%m-%dT%I:%M:%SZ").replace(tzinfo=pytz.UTC)
+        else:
+            sync_end = singer.utils.now() - datetime.timedelta(minutes=1)
         epoch_sync_end = int(sync_end.strftime('%s'))
         parsed_sync_end = singer.strftime(sync_end, "%Y-%m-%dT%H:%M:%SZ")
 
@@ -539,6 +563,10 @@ class TicketMetricEvents(Stream):
 
         ticket_metric_events = self.client.ticket_metric_events(start_time=bookmark)
         for ticket_metric_event in ticket_metric_events:
+            if 'end_date' in self.config:
+                end_date_reached = check_end_date(ticket_metric_event, self.config['end_date'], self.replication_key)
+                if end_date_reached:
+                    break;
             if utils.strptime_with_tz(ticket_metric_event.time) >= bookmark:
                 # NB: We don't trust that the records come back ordered by
                 # updated_at (we've observed out-of-order records),

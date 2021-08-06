@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import json
 import sys, os
-
+from datetime import datetime
 from zenpy import Zenpy
 import requests
 from requests import Session
@@ -215,7 +215,6 @@ def get_session(config):
 @singer.utils.handle_top_exception(LOGGER)
 def main():
     parsed_args = singer.utils.parse_args(REQUIRED_CONFIG_KEYS)
-
     # OAuth has precedence
     creds = oauth_auth(parsed_args) or api_token_auth(parsed_args)
     session = get_session(parsed_args.config)
