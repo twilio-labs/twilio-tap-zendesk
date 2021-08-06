@@ -35,9 +35,9 @@ def get_sideload_objects(stream):
 
 def check_end_date(record, end_date, replication_key):
     record_key_date =process_record(record)[replication_key]
-    end_date = round(datetime.datetime.strptime(end_date, "%Y-%m-%dT%I:%M:%SZ").timestamp())
+    end_date = round(datetime.datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%SZ").timestamp())
     if not isinstance(record_key_date, int):
-        record_key_date = round(datetime.datetime.strptime(record_key_date, "%Y-%m-%dT%I:%M:%SZ").timestamp())
+        record_key_date = round(datetime.datetime.strptime(record_key_date, "%Y-%m-%dT%H:%M:%SZ").timestamp())
     return record_key_date > end_date
 
 def get_abs_path(path):
@@ -184,7 +184,7 @@ class Users(Stream):
         start = bookmark - datetime.timedelta(seconds=1)
         end = start + datetime.timedelta(seconds=search_window_size)
         if 'end_date' in self.config:
-            sync_end = datetime.datetime.strptime(self.config['end_date'], "%Y-%m-%dT%I:%M:%SZ").replace(tzinfo=pytz.UTC)
+            sync_end = datetime.datetime.strptime(self.config['end_date'], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.UTC)
         else:
             sync_end = singer.utils.now() - datetime.timedelta(minutes=1)
         parsed_sync_end = singer.strftime(sync_end, "%Y-%m-%dT%H:%M:%SZ")
@@ -397,7 +397,7 @@ class SatisfactionRatings(Stream):
         start = bookmark - datetime.timedelta(seconds=1)
         end = start + datetime.timedelta(seconds=search_window_size)
         if 'end_date' in self.config:
-            sync_end = datetime.datetime.strptime(self.config['end_date'], "%Y-%m-%dT%I:%M:%SZ").replace(tzinfo=pytz.UTC)
+            sync_end = datetime.datetime.strptime(self.config['end_date'], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.UTC)
         else:
             sync_end = singer.utils.now() - datetime.timedelta(minutes=1)
         epoch_sync_end = int(sync_end.strftime('%s'))
