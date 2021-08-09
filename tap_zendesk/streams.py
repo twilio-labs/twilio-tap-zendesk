@@ -33,12 +33,14 @@ def get_sideload_objects(stream):
     """Returns the value of sideload-objects from metadata, returns None if no values are present"""
     return metadata.to_map(stream.metadata).get((), {}).get('sideload-objects')
 
-def check_end_date(record, end_date, replication_key):
-    record_key_date =process_record(record)[replication_key]
-    end_date = round(datetime.datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%SZ").timestamp())
-    if not isinstance(record_key_date, int):
-        record_key_date = round(datetime.datetime.strptime(record_key_date, "%Y-%m-%dT%H:%M:%SZ").timestamp())
-    return record_key_date > end_date
+def check_end_date(record, config, replication_key):
+    if 'end_date' in config:
+        record_key_date =process_record(record)[replication_key]
+        end_date = round(datetime.datetime.strptime(config['end_date'], "%Y-%m-%dT%H:%M:%SZ").timestamp())
+        if not isinstance(record_key_date, int):
+            record_key_date = round(datetime.datetime.strptime(record_key_date, "%Y-%m-%dT%H:%M:%SZ").timestamp())
+        return record_key_date > end_date
+    else: return False;
 
 def get_abs_path(path):
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
@@ -153,10 +155,8 @@ class Organizations(Stream):
         bookmark = self.get_bookmark(state)
         organizations = self.client.organizations.incremental(start_time=bookmark)
         for organization in organizations:
-            if 'end_date' in self.config:
-                end_date_reached = check_end_date(organization, self.config['end_date'], self.replication_key)
-                if end_date_reached:
-                    break;
+            if check_end_date(organization, self.config, self.replication_key):
+                break;
             self.update_bookmark(state, organization.updated_at)
             yield (self.stream, organization)
 
@@ -290,10 +290,8 @@ class Tickets(Stream):
             zendesk_metrics.capture('ticket')
             generated_timestamp_dt = datetime.datetime.utcfromtimestamp(ticket.generated_timestamp).replace(tzinfo=pytz.UTC)
 
-            if 'end_date' in self.config:
-                end_date_reached = check_end_date(ticket, self.config['end_date'], self.replication_key)
-                if end_date_reached:
-                    break;
+            if check_end_date(ticket, self.config, self.replication_key):
+                break;
 
             self.update_bookmark(state, utils.strftime(generated_timestamp_dt))
 
@@ -563,10 +561,8 @@ class TicketMetricEvents(Stream):
 
         ticket_metric_events = self.client.ticket_metric_events(start_time=bookmark)
         for ticket_metric_event in ticket_metric_events:
-            if 'end_date' in self.config:
-                end_date_reached = check_end_date(ticket_metric_event, self.config['end_date'], self.replication_key)
-                if end_date_reached:
-                    break;
+            if check_end_date(ticket_metric_event, self.config, self.replication_key):
+                break;
             if utils.strptime_with_tz(ticket_metric_event.time) >= bookmark:
                 # NB: We don't trust that the records come back ordered by
                 # updated_at (we've observed out-of-order records),
