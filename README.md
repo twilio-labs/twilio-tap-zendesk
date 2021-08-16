@@ -39,10 +39,10 @@ For a simplified, but less granular setup, you can use the API Token authenticat
 }
 ```
 
-An optional end_date field is can be added to the config.json 
+An optional `end_date` field can be added to the `config.json`
 This functionality has been added to ease the backfill procedure for a limited time duration for Zendesk
 
-If passed, data would be loaded for date >= start_date and date < end_date
+If passed, data would be loaded for `date >= start_date and date < end_date`
 
 ### Sideloading for tickets
 
@@ -62,11 +62,11 @@ Sideload supported for tickets:
 3. metric_sets
 4. slas
 
-To sideload an object a list can be passed in the metadata for tickets object in the catalog.json file
+To sideload an object a list can be passed in the metadata under `sideload-objects` for tickets object in the catalog.json file
 
 e.g.
 ```json
-"metadata": [
+{"metadata": [
         {
           "breadcrumb": [],
           "metadata": {
@@ -78,7 +78,7 @@ e.g.
               "generated_timestamp"
             ],
             sideload-objects: ["comment_count","dates","metric_events","slas"]
-          }
+          }]
         }
 ```
 
