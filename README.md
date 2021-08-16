@@ -77,9 +77,10 @@ e.g.
             "valid-replication-keys": [
               "generated_timestamp"
             ],
-            sideload-objects: ["comment_count","dates","metric_events","slas"]
-          }]
-        }
+            "sideload-objects": ["comment_count","dates","metric_events","slas"]
+          }
+        }]
+}
 ```
 
 note: above extract is a part of the complete metadata for tickets 
