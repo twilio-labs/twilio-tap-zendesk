@@ -19,7 +19,7 @@ OAuth is the default authentication method for `tap-zendesk`. To use OAuth, you 
 {
   "access_token": "AVERYLONGOAUTHTOKEN",
   "subdomain": "acme",
-  "start_date": "2000-01-01T00:00:00Z",
+  "start_date": "2000-01-01T00:00:00Z"
 }
 
 
