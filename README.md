@@ -54,8 +54,7 @@ There are two ways in which the records are returned:
 1. Within the same object as a column
 2. As a separate object 
 
-Here we have provided support for sideloading only the 1st type i.e. the attributes returned in the same object
-as additional columns
+Here we have provided support for sideloading only the 1st type i.e. the attributes returned in the same object as additional columns
 
 Sideload supported for tickets:
 1. comment_count
