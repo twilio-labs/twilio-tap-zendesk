@@ -35,12 +35,13 @@ def get_sideload_objects(stream):
 
 def check_end_date(record, config, replication_key):
     if 'end_date' in config:
-        record_key_date =process_record(record)[replication_key]
+        record_key_date = process_record(record)[replication_key]
         end_date = round(datetime.datetime.strptime(config['end_date'], "%Y-%m-%dT%H:%M:%SZ").timestamp())
         if not isinstance(record_key_date, int):
             record_key_date = round(datetime.datetime.strptime(record_key_date, "%Y-%m-%dT%H:%M:%SZ").timestamp())
         return record_key_date > end_date
-    else: return False;
+    else:
+        return False
 
 def get_abs_path(path):
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
@@ -156,7 +157,7 @@ class Organizations(Stream):
         organizations = self.client.organizations.incremental(start_time=bookmark)
         for organization in organizations:
             if check_end_date(organization, self.config, self.replication_key):
-                break;
+                break
             self.update_bookmark(state, organization.updated_at)
             yield (self.stream, organization)
 
