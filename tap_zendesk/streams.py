@@ -292,7 +292,7 @@ class Tickets(Stream):
             generated_timestamp_dt = datetime.datetime.utcfromtimestamp(ticket.generated_timestamp).replace(tzinfo=pytz.UTC)
 
             if check_end_date(ticket, self.config, self.replication_key):
-                break;
+                break
 
             self.update_bookmark(state, utils.strftime(generated_timestamp_dt))
 
@@ -563,7 +563,7 @@ class TicketMetricEvents(Stream):
         ticket_metric_events = self.client.ticket_metric_events(start_time=bookmark)
         for ticket_metric_event in ticket_metric_events:
             if check_end_date(ticket_metric_event, self.config, self.replication_key):
-                break;
+                break
             if utils.strptime_with_tz(ticket_metric_event.time) >= bookmark:
                 # NB: We don't trust that the records come back ordered by
                 # updated_at (we've observed out-of-order records),
