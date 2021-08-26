@@ -582,7 +582,7 @@ class AgentsActivity(Stream):
         while len(agents_activity) > 1:
             for agent_activity in agents_activity:
                 yield (self.stream, agent_activity)
-            page=page + 1
+            page = page + 1
             agents_activity = self.client.talk.agents_activity(page=page)
 
 STREAMS = {
