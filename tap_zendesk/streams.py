@@ -571,6 +571,20 @@ class TicketMetricEvents(Stream):
                 self.update_bookmark(state, ticket_metric_event.time)
                 yield (self.stream, ticket_metric_event)
 
+class AgentsActivity(Stream):
+    name = "agents_activity"
+    replication_method = "FULL_TABLE"
+
+    def sync(self, state): # pylint: disable=unused-argument
+
+        page = 1
+        agents_activity = self.client.talk.agents_activity(page=page)
+        while len(agents_activity) > 1:
+            for agent_activity in agents_activity:
+                yield (self.stream, agent_activity)
+            page=page + 1
+            agents_activity = self.client.talk.agents_activity(page=page)
+
 STREAMS = {
     "tickets": Tickets,
     "groups": Groups,
@@ -587,4 +601,5 @@ STREAMS = {
     "ticket_metrics": TicketMetrics,
     "sla_policies": SLAPolicies,
     "ticket_metric_events": TicketMetricEvents,
+    "agents_activity": AgentsActivity
 }
