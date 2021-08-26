@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.5
+   * Added stream agents_activity
+   * upgraded zenpy version to 2.0.24 
 
 ## 1.0.4
     * Added optional parameter for config `end_date`
