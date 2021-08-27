@@ -95,7 +95,9 @@
         ]
           },
           "call_status": {
-            "type": "null"
+            "type": [ "null",
+            "string"
+            ]
           },
           "agent_state": {
             "type": [
