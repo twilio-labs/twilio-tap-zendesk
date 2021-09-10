@@ -585,6 +585,20 @@ class AgentsActivity(Stream):
             page = page + 1
             agents_activity = self.client.talk.agents_activity(page=page)
 
+class Article(Stream):
+    name = "articles"
+    replication_method = "INCREMENTAL"
+    replication_key = "updated_at"
+
+    def sync(self, state):
+        bookmark = self.get_bookmark(state)
+        articles = self.client.help_center.articles.incremental(start_time=bookmark)
+        for article in articles:
+            if check_end_date(article, self.config, self.replication_key):
+                break
+
+            yield self.stream, article
+
 STREAMS = {
     "tickets": Tickets,
     "groups": Groups,
@@ -601,5 +615,6 @@ STREAMS = {
     "ticket_metrics": TicketMetrics,
     "sla_policies": SLAPolicies,
     "ticket_metric_events": TicketMetricEvents,
-    "agents_activity": AgentsActivity
+    "agents_activity": AgentsActivity,
+    "articles": Article
 }
