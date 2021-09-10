@@ -574,6 +574,7 @@ class TicketMetricEvents(Stream):
 class AgentsActivity(Stream):
     name = "agents_activity"
     replication_method = "FULL_TABLE"
+    key_properties = ["agent_id"]
 
     def sync(self, state): # pylint: disable=unused-argument
 
