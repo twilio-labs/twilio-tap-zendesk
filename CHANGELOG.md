@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.7
+    * Adding key as agent_id for agents_activity 
+    * Adding help center article stream
+    
 ## 1.0.6
     * Adding schema type "string" to call status field for agents_activity
     
