@@ -600,6 +600,20 @@ class Article(Stream):
 
             yield self.stream, article
 
+class Call(Stream):
+    name = "calls"
+    replication_method = "INCREMENTAL"
+    replication_key = "updated_at"
+
+    def sync(self, state):
+        bookmark = self.get_bookmark(state)
+        calls = self.client.talk.calls.incremental(start_time=bookmark)
+        for call in calls:
+            if check_end_date(call, self.config, self.replication_key):
+                break
+
+            yield self.stream, call
+
 STREAMS = {
     "tickets": Tickets,
     "groups": Groups,
@@ -617,5 +631,6 @@ STREAMS = {
     "sla_policies": SLAPolicies,
     "ticket_metric_events": TicketMetricEvents,
     "agents_activity": AgentsActivity,
-    "articles": Article
+    "articles": Article,
+    "calls": Call
 }
