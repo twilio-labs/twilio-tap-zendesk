@@ -597,8 +597,9 @@ class Article(Stream):
         for article in articles:
             if check_end_date(article, self.config, self.replication_key):
                 break
-
-            yield self.stream, article
+            if utils.strptime_with_tz(article.updated_at) >= bookmark:
+                self.update_bookmark(state, article.updated_at)
+                yield self.stream, article
 
 class Call(Stream):
     name = "calls"
@@ -611,8 +612,9 @@ class Call(Stream):
         for call in calls:
             if check_end_date(call, self.config, self.replication_key):
                 break
-
-            yield self.stream, call
+            if utils.strptime_with_tz(call.updated_at) >= bookmark:
+                self.update_bookmark(state, call.updated_at)
+                yield self.stream, call
 
 STREAMS = {
     "tickets": Tickets,
