@@ -1,6 +1,9 @@
 # Changelog
 
 ## 1.0.7
+    * Adding Calls stream
+    
+## 1.0.7
     * Adding key as agent_id for agents_activity 
     * Adding help center article stream
     
