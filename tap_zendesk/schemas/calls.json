@@ -16,6 +16,12 @@
           "string"
         ]
     },
+    "call_group_id": {
+      "type": [
+          "null",
+          "integer"
+        ]
+    },
     "call_recording_consent": {
       "type": [
           "null",
