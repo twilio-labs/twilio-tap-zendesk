@@ -569,7 +569,7 @@ class TicketMetricEvents(Stream):
                 # updated_at (we've observed out-of-order records),
                 # so we can't save state until we've seen all records
                 self.update_bookmark(state, ticket_metric_event.time)
-                yield (self.stream, ticket_metric_event)
+            yield (self.stream, ticket_metric_event)
 
 class AgentsActivity(Stream):
     name = "agents_activity"
@@ -599,7 +599,7 @@ class Article(Stream):
                 break
             if utils.strptime_with_tz(article.updated_at) >= bookmark:
                 self.update_bookmark(state, article.updated_at)
-                yield self.stream, article
+            yield self.stream, article
 
 class Call(Stream):
     name = "calls"
@@ -614,7 +614,7 @@ class Call(Stream):
                 break
             if utils.strptime_with_tz(call.updated_at) >= bookmark:
                 self.update_bookmark(state, call.updated_at)
-                yield self.stream, call
+            yield self.stream, call
 
 STREAMS = {
     "tickets": Tickets,
