@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
       name='twilio-tap-zendesk',
-      version='1.0.9',
+      version='1.0.10',
       description='Singer.io tap for extracting data from the Zendesk API',
       author='Twilio',
       url='https://github.com/twilio-labs/twilio-tap-zendesk',
