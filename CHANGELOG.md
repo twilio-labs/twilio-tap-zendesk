@@ -1,6 +1,12 @@
 # Changelog
 
-## 1.0.7
+## 1.0.10
+    * zendesk metric events fix for random unordered records 
+    
+## 1.0.9
+    * Adding field to call schema
+    
+## 1.0.8
     * Adding Calls stream
     
 ## 1.0.7
