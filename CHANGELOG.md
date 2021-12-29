@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.11
+    * zendesk users fix for fetching non-active users
+    
 ## 1.0.10
     * zendesk metric events fix for random unordered records 
     
