@@ -48,6 +48,7 @@ class ZendeskTest(unittest.TestCase):
             'group_memberships',
             'macros',
             'organizations',
+            'organization_memberships',
             'satisfaction_ratings',
             'sla_policies',
             'tags',
