@@ -161,6 +161,31 @@ class Organizations(Stream):
             self.update_bookmark(state, organization.updated_at)
             yield (self.stream, organization)
 
+class OrganizationMemberships(Stream):
+    name = "organization_memberships"
+    replication_method = "INCREMENTAL"
+    replication_key = "updated_at"
+
+    def sync(self, state):
+        bookmark = self.get_bookmark(state)
+
+        memberships = self.client.organization_memberships()
+        for membership in memberships:
+            # some organization memberships come back without an updated_at
+            if membership.updated_at:
+                if utils.strptime_with_tz(membership.updated_at) >= bookmark:
+                    # NB: We don't trust that the records come back ordered by
+                    # updated_at (we've observed out-of-order records),
+                    # so we can't save state until we've seen all records
+                    self.update_bookmark(state, membership.updated_at)
+                    yield (self.stream, membership)
+            else:
+                if membership.id:
+                    LOGGER.info('organization_membership record with id: ' + str(membership.id) +
+                                ' does not have an updated_at field so it will be syncd...')
+                    yield (self.stream, membership)
+                else:
+                    LOGGER.info('Received organization_membership record with no id or updated_at, skipping...')
 
 class Users(Stream):
     name = "users"
@@ -569,6 +594,7 @@ STREAMS = {
     "groups": Groups,
     "users": Users,
     "organizations": Organizations,
+    "organization_memberships": OrganizationMemberships,
     "ticket_audits": TicketAudits,
     "ticket_comments": TicketComments,
     "ticket_fields": TicketFields,
