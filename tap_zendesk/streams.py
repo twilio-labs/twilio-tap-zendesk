@@ -589,6 +589,21 @@ class Call(Stream):
                 self.update_bookmark(state, call.updated_at)
             yield self.stream, call
 
+class Call_legs(Stream):
+    name = "call_legs"
+    replication_method = "INCREMENTAL"
+    replication_key = "updated_at"
+
+    def sync(self, state):
+        bookmark = self.get_bookmark(state)
+        legs = self.client.talk.legs.incremental(start_time=bookmark)
+        for leg in legs:
+            if check_end_date(leg, self.config, self.replication_key):
+                break
+            if utils.strptime_with_tz(leg.updated_at) >= bookmark:
+                self.update_bookmark(state, leg.updated_at)
+            yield self.stream, leg
+
 STREAMS = {
     "tickets": Tickets,
     "groups": Groups,
@@ -608,5 +623,6 @@ STREAMS = {
     "ticket_metric_events": TicketMetricEvents,
     "agents_activity": AgentsActivity,
     "articles": Article,
-    "calls": Call
+    "calls": Call,
+    "call_legs": Call_legs
 }
