@@ -245,7 +245,6 @@ class Tickets(Stream):
         bookmark = self.get_bookmark(state)
         sideload_objects = get_sideload_objects(self.stream)
         records_per_page = self.config.get('records_per_page', 200)
-        LOGGER.info("Got records per page: %s", records_per_page)
         tickets = self.client.tickets.incremental(start_time=bookmark, include=sideload_objects, per_page=records_per_page)
         audits_stream = TicketAudits(self.client)
         metrics_stream = TicketMetrics(self.client)
