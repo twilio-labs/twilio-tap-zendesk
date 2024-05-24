@@ -44,6 +44,10 @@ This functionality has been added to ease the backfill procedure for a limited t
 
 If passed, data would be loaded for `date >= start_date and date < end_date`
 
+A second, optional, configurable field `skip_deleted` can also be passed in the config. This defaults to `True`, and means that if a ticket's status field is `deleted`, the audits, metrics and comments will not be requested for that ticket ID. 
+
+Note that the `status = deleted` flag is only valid for the `/incremental/tickets` endpoint, not `/tickets`.
+
 ### Sideloading for tickets
 
 Sideloading is a functionality provided by Zendesk to fetch related records in a single request 
