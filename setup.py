@@ -12,7 +12,7 @@ setup(
       py_modules=['tap_zendesk'],
       install_requires=[
           'pipelinewise-singer-python==1.2.0',
-          'zenpy==2.0.25',
+          'zenpy==2.0.39',
           'requests==2.20.0'
       ],
       extras_require={
