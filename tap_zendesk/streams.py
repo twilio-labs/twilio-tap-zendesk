@@ -400,7 +400,7 @@ class SatisfactionRatings(Stream):
             # minutes, due to this, the tap will adjust the time range
             # dynamically to ensure bookmarks are able to be written in
             # cases of high volume.
-            if satisfaction_ratings.count > 50000:
+            if len(satisfaction_ratings) > 50000:
                 search_window_size = search_window_size // 2
                 end = start + datetime.timedelta(seconds=search_window_size)
                 LOGGER.info("satisfaction_ratings - Detected Search API response size for this window is too large (> 50k). Cutting search window in half to %s seconds.", search_window_size)
