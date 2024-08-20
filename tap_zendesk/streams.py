@@ -1,7 +1,7 @@
 import os
 import json
 import datetime
-import time
+import math
 import pytz
 import zenpy
 from zenpy.lib.exception import RecordNotFoundException
@@ -384,16 +384,17 @@ class SatisfactionRatings(Stream):
             sync_end = datetime.datetime.strptime(self.config['end_date'], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.UTC)
         else:
             sync_end = singer.utils.now() - datetime.timedelta(minutes=1)
-        epoch_sync_end = int(sync_end.strftime('%s'))
+        epoch_sync_end = math.floor(sync_end.timestamp())
         parsed_sync_end = singer.strftime(sync_end, "%Y-%m-%dT%H:%M:%SZ")
 
         while start < sync_end:
-            epoch_start = int(start.strftime('%s'))
+            epoch_start = math.floor(start.timestamp())
             parsed_start = singer.strftime(start, "%Y-%m-%dT%H:%M:%SZ")
-            epoch_end = int(end.strftime('%s'))
+            epoch_end = math.floor(end.timestamp())
             parsed_end = singer.strftime(end, "%Y-%m-%dT%H:%M:%SZ")
 
             LOGGER.info("Querying for satisfaction ratings between %s and %s", parsed_start, min(parsed_end, parsed_sync_end))
+            LOGGER.info("Querying for satisfaction ratings between %s and %s", epoch_start, min(epoch_end, epoch_sync_end))
             satisfaction_ratings = self.client.satisfaction_ratings(start_time=epoch_start,
                                                                     end_time=min(epoch_end, epoch_sync_end))
             # NB: We've observed that the tap can sync 50k records in ~15
