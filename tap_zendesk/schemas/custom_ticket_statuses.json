@@ -1,0 +1,54 @@
+{
+    "type": ["null","object"],
+    "properties": {
+        "active": {
+            "type": ["null", "boolean"],
+            "default": false
+        },
+        "agent_label": {
+            "type": ["null", "string"],
+            "maxLength": 48
+        },
+        "created_at": {
+            "type": ["null", "string"],
+            "format": "date-time"
+        },
+        "default": {
+            "type": ["null", "boolean"],
+            "default": false
+        },
+        "description": {
+            "type": ["null", "string"]
+        },
+        "end_user_description": {
+            "type": ["null", "string"]
+        },
+        "end_user_label": {
+            "type": ["null", "string"],
+            "maxLength": 48
+        },
+        "id": {
+            "type": ["null", "integer"]
+        },
+        "raw_agent_label": {
+            "type": ["null", "string"]
+        },
+        "raw_description": {
+            "type": ["null", "string"]
+        },
+        "raw_end_user_description": {
+            "type": ["null", "string"]
+        },
+        "raw_end_user_label": {
+            "type": ["null", "string"]
+        },
+        "status_category": {
+            "type": ["null", "string"],
+            "enum": ["new", "open", "pending", "hold", "solved"]
+        },
+        "updated_at": {
+            "type": ["null", "string"],
+            "format": "date-time"
+        }
+    }
+}

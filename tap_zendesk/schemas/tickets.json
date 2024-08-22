@@ -161,6 +161,12 @@
         "array"
       ]
     },
+    "custom_status_id": {
+      "type": [
+        "null",
+        "integer"
+      ]
+    },
     "url": {
       "type": [
         "null",
