@@ -250,6 +250,7 @@ class Tickets(Stream):
         audits_stream = TicketAudits(self.client)
         metrics_stream = TicketMetrics(self.client)
         comments_stream = TicketComments(self.client)
+        jira_links_stream = JiraLinks(self.client)
 
         def emit_sub_stream_metrics(sub_stream):
             if sub_stream.is_selected():
@@ -309,10 +310,6 @@ class Tickets(Stream):
                     except RecordNotFoundException:
                         LOGGER.warning("Unable to retrieve comments for ticket (ID: %s), " \
                         "the Zendesk API returned a RecordNotFound error", ticket_dict["id"])
-
-            else:
-                LOGGER.info("Not attempting to retrieve audits, metrics or comments for ticket (ID: %s) as "
-                            "ticket status is %s", ticket_dict["id"], ticket_dict["status"])
 
 
             if should_yield:
@@ -617,6 +614,17 @@ class Call_legs(Stream):
                 self.update_bookmark(state, leg.updated_at)
             yield self.stream, leg
 
+
+class JiraLinks(Stream):
+    name = "jira_links"
+    replication_method = "FULL_TABLE"
+
+    def sync(self, state): # pylint: disable=unused-argument
+        for link in self.client.jira_links():
+            yield (self.stream, link)
+
+
+
 STREAMS = {
     "tickets": Tickets,
     "groups": Groups,
@@ -637,5 +645,6 @@ STREAMS = {
     "agents_activity": AgentsActivity,
     "articles": Article,
     "calls": Call,
-    "call_legs": Call_legs
+    "call_legs": Call_legs,
+    "jira_links": JiraLinks,
 }
