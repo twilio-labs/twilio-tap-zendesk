@@ -330,7 +330,6 @@ class Tickets(Stream):
         emit_sub_stream_metrics(comments_stream)
         singer.write_state(state)
 
-
 class TicketAudits(Stream):
     name = "ticket_audits"
     replication_method = "INCREMENTAL"
@@ -342,7 +341,6 @@ class TicketAudits(Stream):
             self.count += 1
             yield (self.stream, ticket_audit)
 
-
 class TicketMetrics(Stream):
     name = "ticket_metrics"
     replication_method = "INCREMENTAL"
@@ -352,7 +350,6 @@ class TicketMetrics(Stream):
         ticket_metric = self.client.tickets.metrics(ticket=ticket_id)
         self.count += 1
         yield (self.stream, ticket_metric)
-
 
 class TicketComments(Stream):
     name = "ticket_comments"
@@ -364,7 +361,6 @@ class TicketComments(Stream):
         for ticket_comment in ticket_comments:
             self.count += 1
             yield (self.stream, ticket_comment)
-
 
 class SatisfactionRatings(Stream):
     name = "satisfaction_ratings"
@@ -427,7 +423,6 @@ class SatisfactionRatings(Stream):
             start = end - datetime.timedelta(seconds=1)
             end = start + datetime.timedelta(seconds=search_window_size)
 
-
 class Groups(Stream):
     name = "groups"
     replication_method = "INCREMENTAL"
@@ -444,7 +439,6 @@ class Groups(Stream):
                 # so we can't save state until we've seen all records
                 self.update_bookmark(state, group.updated_at)
                 yield (self.stream, group)
-
 
 class Macros(Stream):
     name = "macros"
@@ -463,7 +457,6 @@ class Macros(Stream):
                 self.update_bookmark(state, macro.updated_at)
                 yield (self.stream, macro)
 
-
 class Tags(Stream):
     name = "tags"
     replication_method = "FULL_TABLE"
@@ -475,7 +468,6 @@ class Tags(Stream):
         tags = self.client.tags(page=1)
         for tag in tags:
             yield (self.stream, tag)
-
 
 class TicketFields(Stream):
     name = "ticket_fields"
@@ -494,7 +486,6 @@ class TicketFields(Stream):
                 self.update_bookmark(state, field.updated_at)
                 yield (self.stream, field)
 
-
 class TicketForms(Stream):
     name = "ticket_forms"
     replication_method = "INCREMENTAL"
@@ -511,7 +502,6 @@ class TicketForms(Stream):
                 # so we can't save state until we've seen all records
                 self.update_bookmark(state, form.updated_at)
                 yield (self.stream, form)
-
 
 class GroupMemberships(Stream):
     name = "group_memberships"
@@ -539,7 +529,6 @@ class GroupMemberships(Stream):
                 else:
                     LOGGER.info('Received group_membership record with no id or updated_at, skipping...')
 
-
 class SLAPolicies(Stream):
     name = "sla_policies"
     replication_method = "FULL_TABLE"
@@ -547,7 +536,6 @@ class SLAPolicies(Stream):
     def sync(self, state): # pylint: disable=unused-argument
         for policy in self.client.sla_policies():
             yield (self.stream, policy)
-
 
 class TicketMetricEvents(Stream):
     name = "ticket_metric_events"
@@ -583,7 +571,6 @@ class AgentsActivity(Stream):
             page = page + 1
             agents_activity = self.client.talk.agents_activity(page=page)
 
-
 class Article(Stream):
     name = "articles"
     replication_method = "INCREMENTAL"
@@ -598,7 +585,6 @@ class Article(Stream):
             if utils.strptime_with_tz(article.updated_at) >= bookmark:
                 self.update_bookmark(state, article.updated_at)
             yield self.stream, article
-
 
 class Call(Stream):
     name = "calls"
@@ -615,7 +601,6 @@ class Call(Stream):
                 self.update_bookmark(state, call.updated_at)
             yield self.stream, call
 
-
 class Call_legs(Stream):
     name = "call_legs"
     replication_method = "INCREMENTAL"
@@ -630,7 +615,6 @@ class Call_legs(Stream):
             if utils.strptime_with_tz(leg.updated_at) >= bookmark:
                 self.update_bookmark(state, leg.updated_at)
             yield self.stream, leg
-
 
 class JiraLinks(Stream):
     name = "jira_links"
