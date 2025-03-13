@@ -1,4 +1,23 @@
 # Changelog
+## 1.0.19
+    * Added new stream 'jira_links' to fetch jira links for tickets
+
+## 1.0.18
+    * Added timestamp fix for zendesk satisfaction rating API
+
+## 1.0.17
+    * Fix breaking change in zenpy for satisfaction ratings stream
+    * Was failing with error `AttributeError: 'GenericCursorResultsGenerator' object has no attribute 'count'`
+
+## 1.0.16 
+    * Upgrade zenpy version to 2.0.49 to allow cursor pagination
+
+## 1.0.15
+    * Omit GET requests for deleted tickets
+
+## 1.0.14
+    * Adding per_page parameter to API call for tickets stream (configurable - records_per_page)
+    * Stream was failing with 504 Server Error: Gateway Timeout
 
 ## 1.0.11
     * zendesk users fix for fetching non-active users
