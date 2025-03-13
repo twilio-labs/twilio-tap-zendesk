@@ -13,7 +13,7 @@ setup(
       install_requires=[
           'pipelinewise-singer-python==1.2.0',
           'zenpy==2.0.49',
-          'requests==2.20.0'
+          'requests==2.29.0'
       ],
       extras_require={
           'dev': [
