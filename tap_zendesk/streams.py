@@ -250,6 +250,7 @@ class Tickets(Stream):
         audits_stream = TicketAudits(self.client)
         metrics_stream = TicketMetrics(self.client)
         comments_stream = TicketComments(self.client)
+        jira_links_stream = JiraLinks(self.client)
 
         def emit_sub_stream_metrics(sub_stream):
             if sub_stream.is_selected():
@@ -313,7 +314,6 @@ class Tickets(Stream):
             else:
                 LOGGER.info("Not attempting to retrieve audits, metrics or comments for ticket (ID: %s) as "
                             "ticket status is %s", ticket_dict["id"], ticket_dict["status"])
-
 
             if should_yield:
                 for rec in self._empty_buffer():
@@ -422,7 +422,6 @@ class SatisfactionRatings(Stream):
 
             start = end - datetime.timedelta(seconds=1)
             end = start + datetime.timedelta(seconds=search_window_size)
-
 
 class Groups(Stream):
     name = "groups"
@@ -617,6 +616,15 @@ class Call_legs(Stream):
                 self.update_bookmark(state, leg.updated_at)
             yield self.stream, leg
 
+class JiraLinks(Stream):
+    name = "jira_links"
+    replication_method = "FULL_TABLE"
+
+    def sync(self, state): # pylint: disable=unused-argument
+        for link in self.client.jira_links():
+            yield (self.stream, link)
+
+
 STREAMS = {
     "tickets": Tickets,
     "groups": Groups,
@@ -637,5 +645,6 @@ STREAMS = {
     "agents_activity": AgentsActivity,
     "articles": Article,
     "calls": Call,
-    "call_legs": Call_legs
+    "call_legs": Call_legs,
+    "jira_links": JiraLinks,
 }
