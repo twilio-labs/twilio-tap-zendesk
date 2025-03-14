@@ -489,6 +489,18 @@
               "null",
               "string"
             ]
+          },
+          "new_schedule_id": {
+             "type": [
+                 "null",
+                 "string"
+             ]
+          },
+          "previous_schedule_id": {
+             "type": [
+                 "null",
+                 "string"
+             ]
           }
         }
       }
