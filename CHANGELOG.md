@@ -1,4 +1,8 @@
 # Changelog
+## 1.0.20
+    * Bounded tickets pipeline (tickets, ticket_audits, ticket_metrics, ticket_comments) to sync-start time when no `end_date` is set in config, giving each run a fixed cutoff instead of chasing the present
+    * Fixed timezone bug in `check_end_date`: `end_date` values with a trailing `Z` were being parsed as naive datetimes and converted via local time, shifting the cutoff by the host's UTC offset. Now parsed as UTC via `singer.utils.strptime_with_tz`, which also accepts microsecond precision.
+
 ## 1.0.19
     * Added new stream 'jira_links' to fetch jira links for tickets
 
