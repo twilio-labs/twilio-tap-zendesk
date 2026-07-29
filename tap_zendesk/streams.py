@@ -248,6 +248,7 @@ class Tickets(Stream):
         sideload_objects = get_sideload_objects(self.stream)
         records_per_page = self.config.get('records_per_page', 200)
         effective_end_date = self.config.get('end_date') or utils.strftime(utils.now(), "%Y-%m-%dT%H:%M:%SZ")
+        LOGGER.info("Tickets sync starting from start_time: %s", utils.strftime(bookmark))
         LOGGER.info("Tickets sync bounded by end_date: %s", effective_end_date)
         tickets = self.client.tickets.incremental(start_time=bookmark, include=sideload_objects, per_page=records_per_page)
         audits_stream = TicketAudits(self.client)
