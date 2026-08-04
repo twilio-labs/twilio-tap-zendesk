@@ -34,12 +34,13 @@ def get_sideload_objects(stream):
     """Returns the value of sideload-objects from metadata, returns None if no values are present"""
     return metadata.to_map(stream.metadata).get((), {}).get('sideload-objects')
 
-def check_end_date(record, config, replication_key):
-    if 'end_date' in config:
+def check_end_date(record, config, replication_key, end_date_override=None):
+    end_date_str = end_date_override or config.get('end_date')
+    if end_date_str:
         record_key_date = process_record(record)[replication_key]
-        end_date = round(datetime.datetime.strptime(config['end_date'], "%Y-%m-%dT%H:%M:%SZ").timestamp())
+        end_date = round(utils.strptime_with_tz(end_date_str).timestamp())
         if not isinstance(record_key_date, int):
-            record_key_date = round(datetime.datetime.strptime(record_key_date, "%Y-%m-%dT%H:%M:%SZ").timestamp())
+            record_key_date = round(utils.strptime_with_tz(record_key_date).timestamp())
         return record_key_date > end_date
     else:
         return False
@@ -246,6 +247,9 @@ class Tickets(Stream):
         bookmark = self.get_bookmark(state)
         sideload_objects = get_sideload_objects(self.stream)
         records_per_page = self.config.get('records_per_page', 200)
+        effective_end_date = self.config.get('end_date') or utils.strftime(utils.now(), "%Y-%m-%dT%H:%M:%SZ")
+        LOGGER.info("Tickets sync starting from start_time: %s", utils.strftime(bookmark))
+        LOGGER.info("Tickets sync bounded by end_date: %s", effective_end_date)
         tickets = self.client.tickets.incremental(start_time=bookmark, include=sideload_objects, per_page=records_per_page)
         audits_stream = TicketAudits(self.client)
         metrics_stream = TicketMetrics(self.client)
@@ -267,7 +271,7 @@ class Tickets(Stream):
             zendesk_metrics.capture('ticket')
             generated_timestamp_dt = datetime.datetime.utcfromtimestamp(ticket.generated_timestamp).replace(tzinfo=pytz.UTC)
 
-            if check_end_date(ticket, self.config, self.replication_key):
+            if check_end_date(ticket, self.config, self.replication_key, end_date_override=effective_end_date):
                 break
 
             self.update_bookmark(state, utils.strftime(generated_timestamp_dt))
