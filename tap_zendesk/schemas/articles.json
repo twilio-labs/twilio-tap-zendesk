@@ -153,12 +153,12 @@
 					"string"
 				]
 			}
+		},
+		"body": {
+			"type": [
+				"null",
+				"string"
+			]
 		}
-	},
-	"body": {
-		"type": [
-			"null",
-			"string"
-		]
 	}
 }
